@@ -1,0 +1,157 @@
+extends layout
+  
+block content
+  script.
+    function setUserAndActivity(player,stat,statValue,round) {
+      document.getElementById("player").value = player; 
+      document.getElementById("stat").value = stat;
+      document.getElementById("statValue").value = statValue;
+      document.getElementById("round").value = round;            
+    };
+  h3 Ottelu #{match.Team.name}
+    | - 
+    | #{match.opponent}
+    | #{moment(match.date).format('DD.MM.YYYY')}
+    | ja Tilastoija #{match.User.name}
+  
+  div 
+    form(name="input", id="statForm", action="savestats", method="post")      
+      input(type="hidden" name="matchId" value="#{match.id}")
+      input(type="hidden" name="teamId" value="#{match.Team.id}")
+      input(type="hidden" name="round" id="round")
+      input(type="hidden" name="player" id="player")
+      input(type="hidden" name="stat" id="stat")
+      input(type="hidden" name="statValue" id="statValue")
+      // alusta round jossain muualla tai resetoituu jokaisen submitin aikaan.
+      - var round=1 
+      p Erä #{round} &nbsp;
+        // nappi ei toimi
+        button(type="button", onclick=" round++ ").
+          Erän vaihto 
+        
+      table(border='1')
+        thead 
+          tr
+            th #{match.Team.name} 
+            th(colspan=4) Vastaanotto 
+            th(colspan=3) Hyökkäys
+            th(colspan=2) Torjunta
+            th(colspan=4) Syöttö
+          tr
+            th Pelaaja        
+            th KUPPI 	 
+            th 2
+            th 3 
+            th VIRHE
+            th PISTE 
+            th 2
+            th VIRHE
+            th Tappo
+            th 2
+            th ÄSSÄ 
+            th 2
+            th 3 
+            th VIRHE
+        tbody
+            each player in match.Team.Players
+                  tr 
+                    td 
+                      // linkki pelaajan tilastointisivulle
+                      a(class='button', href='/matches/#{match.id}/#{player.id}/#{match.Team.id}/showstats' target='playerstats')
+                       | #{player.number}&nbsp;#{player.name}
+                    td 
+                      button(
+                        type='submit'
+                          style="background: #0ce325;  background-image: -webkit-linear-gradient(top, #0ce325, #16802b);  background-image: -moz-linear-gradient(top, #0ce325, #16802b);  background-image: -ms-linear-gradient(top, #0ce325, #16802b);  background-image: -o-linear-gradient(top, #0ce325, #16802b);  background-image: linear-gradient(to bottom, #0ce325, #16802b);  -webkit-border-radius: 28;  -moz-border-radius: 14;  border-radius: 14px; font-family: Arial;  color: #0ce325;  font-size: 20px;  padding: 10px 20px 10px 20px;  text-decoration: none;"
+                        onclick="setUserAndActivity(#{player.id},'pass','1',#{round})"
+                        value="#{player.id}/pass1"
+                      ) + 
+                    td 
+                      button(
+                        type='submit'
+                          style="background: #0ce325;  background-image: -webkit-linear-gradient(top, #0ce325, #16802b);  background-image: -moz-linear-gradient(top, #0ce325, #16802b);  background-image: -ms-linear-gradient(top, #0ce325, #16802b);  background-image: -o-linear-gradient(top, #0ce325, #16802b);  background-image: linear-gradient(to bottom, #0ce325, #16802b);  -webkit-border-radius: 28;  -moz-border-radius: 14;  border-radius: 14px; font-family: Arial;  color: #0ce325;  font-size: 20px;  padding: 10px 20px 10px 20px;  text-decoration: none;"
+                        onclick="setUserAndActivity(#{player.id},'pass','2',#{round})"
+                        value="#{player.id}/pass1"
+                      ) +
+                    td 
+                      button(
+                        type='submit'
+                          style="background: #0ce325;  background-image: -webkit-linear-gradient(top, #0ce325, #16802b);  background-image: -moz-linear-gradient(top, #0ce325, #16802b);  background-image: -ms-linear-gradient(top, #0ce325, #16802b);  background-image: -o-linear-gradient(top, #0ce325, #16802b);  background-image: linear-gradient(to bottom, #0ce325, #16802b);  -webkit-border-radius: 28;  -moz-border-radius: 14;  border-radius: 14px; font-family: Arial;  color: #0ce325;  font-size: 20px;  padding: 10px 20px 10px 20px;  text-decoration: none;"
+                        onclick="setUserAndActivity(#{player.id},'pass','3',#{round})"
+                        value="#{player.id}/pass1"
+                      ) +
+                    td 
+                      button(
+                        type='submit'
+                          style="background: #0ce325;  background-image: -webkit-linear-gradient(top, #0ce325, #16802b);  background-image: -moz-linear-gradient(top, #0ce325, #16802b);  background-image: -ms-linear-gradient(top, #0ce325, #16802b);  background-image: -o-linear-gradient(top, #0ce325, #16802b);  background-image: linear-gradient(to bottom, #0ce325, #16802b);  -webkit-border-radius: 28;  -moz-border-radius: 14;  border-radius: 14px; font-family: Arial;  color: #0ce325;  font-size: 20px;  padding: 10px 20px 10px 20px;  text-decoration: none;"
+                        onclick="setUserAndActivity(#{player.id},'pass','4',#{round})"
+                        value="#{player.id}/pass1"
+                      ) +
+                    td 
+                      button.mybutton(
+                        type='submit'                        
+                        onclick="setUserAndActivity(#{player.id},'attack','1',#{round})"
+                          style="background: #0ce325;  background-image: -webkit-linear-gradient(top, #0ce325, #16802b);  background-image: -moz-linear-gradient(top, #0ce325, #16802b);  background-image: -ms-linear-gradient(top, #0ce325, #16802b);  background-image: -o-linear-gradient(top, #0ce325, #16802b);  background-image: linear-gradient(to bottom, #0ce325, #16802b);  -webkit-border-radius: 28;  -moz-border-radius: 14;  border-radius: 14px; font-family: Arial;  color: #0ce325;  font-size: 20px;  padding: 10px 20px 10px 20px;  text-decoration: none;"
+                        value="#{player.id}/pass1"
+                      ) +
+                    td 
+                      button(
+                        type='submit'
+                          style="background: #0ce325;  background-image: -webkit-linear-gradient(top, #0ce325, #16802b);  background-image: -moz-linear-gradient(top, #0ce325, #16802b);  background-image: -ms-linear-gradient(top, #0ce325, #16802b);  background-image: -o-linear-gradient(top, #0ce325, #16802b);  background-image: linear-gradient(to bottom, #0ce325, #16802b);  -webkit-border-radius: 28;  -moz-border-radius: 14;  border-radius: 14px; font-family: Arial;  color: #0ce325;  font-size: 20px;  padding: 10px 20px 10px 20px;  text-decoration: none;"
+                        onclick="setUserAndActivity(#{player.id},'attack','2',#{round})"
+                        value="#{player.id}/pass1"
+                      ) +
+                    td 
+                      button(
+                        type='submit'
+                          style="background: #0ce325;  background-image: -webkit-linear-gradient(top, #0ce325, #16802b);  background-image: -moz-linear-gradient(top, #0ce325, #16802b);  background-image: -ms-linear-gradient(top, #0ce325, #16802b);  background-image: -o-linear-gradient(top, #0ce325, #16802b);  background-image: linear-gradient(to bottom, #0ce325, #16802b);  -webkit-border-radius: 28;  -moz-border-radius: 14;  border-radius: 14px; font-family: Arial;  color: #0ce325;  font-size: 20px;  padding: 10px 20px 10px 20px;  text-decoration: none;"
+                        onclick="setUserAndActivity(#{player.id},'attack','3',#{round})"
+                        value="#{player.id}/pass1"
+                      ) +                    
+                    td 
+                      button(
+                        type='submit'
+                          style="background: #0ce325;  background-image: -webkit-linear-gradient(top, #0ce325, #16802b);  background-image: -moz-linear-gradient(top, #0ce325, #16802b);  background-image: -ms-linear-gradient(top, #0ce325, #16802b);  background-image: -o-linear-gradient(top, #0ce325, #16802b);  background-image: linear-gradient(to bottom, #0ce325, #16802b);  -webkit-border-radius: 28;  -moz-border-radius: 14;  border-radius: 14px; font-family: Arial;  color: #0ce325;  font-size: 20px;  padding: 10px 20px 10px 20px;  text-decoration: none;"
+                        onclick="setUserAndActivity(#{player.id},'block','1',#{round})"
+                        value="#{player.id}/pass1"
+                      ) +
+                    td 
+                      button(
+                        type='submit'
+                          style="background: #0ce325;  background-image: -webkit-linear-gradient(top, #0ce325, #16802b);  background-image: -moz-linear-gradient(top, #0ce325, #16802b);  background-image: -ms-linear-gradient(top, #0ce325, #16802b);  background-image: -o-linear-gradient(top, #0ce325, #16802b);  background-image: linear-gradient(to bottom, #0ce325, #16802b);  -webkit-border-radius: 28;  -moz-border-radius: 14;  border-radius: 14px; font-family: Arial;  color: #0ce325;  font-size: 20px;  padding: 10px 20px 10px 20px;  text-decoration: none;"
+                        onclick="setUserAndActivity(#{player.id},'block','2',#{round})"
+                        value="#{player.id}/pass1"
+                      ) +
+                    td 
+                      button(
+                        type='submit'
+                          style="background: #0ce325;  background-image: -webkit-linear-gradient(top, #0ce325, #16802b);  background-image: -moz-linear-gradient(top, #0ce325, #16802b);  background-image: -ms-linear-gradient(top, #0ce325, #16802b);  background-image: -o-linear-gradient(top, #0ce325, #16802b);  background-image: linear-gradient(to bottom, #0ce325, #16802b);  -webkit-border-radius: 28;  -moz-border-radius: 14;  border-radius: 14px; font-family: Arial;  color: #0ce325;  font-size: 20px;  padding: 10px 20px 10px 20px;  text-decoration: none;"
+                        onclick="setUserAndActivity(#{player.id},'serve','1',#{round})"
+                        value="#{player.id}/pass1"
+                      ) +
+                    td 
+                      button(
+                        type='submit'
+                          style="background: #0ce325;  background-image: -webkit-linear-gradient(top, #0ce325, #16802b);  background-image: -moz-linear-gradient(top, #0ce325, #16802b);  background-image: -ms-linear-gradient(top, #0ce325, #16802b);  background-image: -o-linear-gradient(top, #0ce325, #16802b);  background-image: linear-gradient(to bottom, #0ce325, #16802b);  -webkit-border-radius: 28;  -moz-border-radius: 14;  border-radius: 14px; font-family: Arial;  color: #0ce325;  font-size: 20px;  padding: 10px 20px 10px 20px;  text-decoration: none;"
+                        onclick="setUserAndActivity(#{player.id},'serve','2',#{round})"
+                        value="#{player.id}/pass1"
+                      ) +
+                    td  
+                      button(
+                        type='submit'
+                          style="background: #0ce325;  background-image: -webkit-linear-gradient(top, #0ce325, #16802b);  background-image: -moz-linear-gradient(top, #0ce325, #16802b);  background-image: -ms-linear-gradient(top, #0ce325, #16802b);  background-image: -o-linear-gradient(top, #0ce325, #16802b);  background-image: linear-gradient(to bottom, #0ce325, #16802b);  -webkit-border-radius: 28;  -moz-border-radius: 14;  border-radius: 14px; font-family: Arial;  color: #0ce325;  font-size: 20px;  padding: 10px 20px 10px 20px;  text-decoration: none;"
+                        onclick="setUserAndActivity(#{player.id},'serve','3',#{round})"
+                        value="#{player.id}/pass1"
+                      ) +
+                    td  
+                      button(
+                        type='submit'
+                          style="background: #0ce325;  background-image: -webkit-linear-gradient(top, #0ce325, #16802b);  background-image: -moz-linear-gradient(top, #0ce325, #16802b);  background-image: -ms-linear-gradient(top, #0ce325, #16802b);  background-image: -o-linear-gradient(top, #0ce325, #16802b);  background-image: linear-gradient(to bottom, #0ce325, #16802b);  -webkit-border-radius: 28;  -moz-border-radius: 14;  border-radius: 14px; font-family: Arial;  color: #0ce325;  font-size: 20px;  padding: 10px 20px 10px 20px;  text-decoration: none;"
+                        onclick="setUserAndActivity(#{player.id},'serve','4',#{round})"
+                        value="#{player.id}/pass1"
+                      ) +
+  include playerstats.jade
+  include teamstats.jade
+  
+      
+      

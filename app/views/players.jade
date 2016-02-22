@@ -1,0 +1,29 @@
+extends layout
+
+block content
+  h2 Luo uusi pelaaja
+  form(action="/createplayer", method="post")
+    | Nimi: 
+    input(type="text", name="name")
+    | Numero: 
+    input(type="text", name="number")
+    | Joukkue: 
+    select(id="team", name="team")
+      each team in teams
+        option(value="#{team.id}") #{team.name}
+
+    input(type="submit")
+  
+  h2 Pelaajat
+  ul
+  each player in players
+    li
+      = player.name 
+      | &nbsp;-  
+      = player.number 
+      | &nbsp;- 
+      = player.Team.name
+      | &nbsp;
+      | (
+      a(href="/players/" + player.id + "/destroy") Poista
+      | )

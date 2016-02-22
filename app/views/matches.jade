@@ -1,0 +1,28 @@
+extends layout
+
+block content
+  h2 Ottelut 
+  div(id:'list4' style='width:320px; font-family:Georgia, Times, serif; font-size:15px;')
+    ul(style='list-style: none')
+    each match in matches
+      li(style='')
+        | #{moment(match.date).format('DD.MM.YYYY')}  #{match.Team.name}  
+        | &nbsp;-&nbsp;
+        | #{match.opponent}
+        a(href="/matches/" + match.id + "/"+ match.Team.id +"/makestats" style='text-decoration:none; color:#000000; background-color:#FFFFFF; line-height:30px; border-bottom-style:solid; border-bottom-width:1px; border-bottom-color:#CCCCCC; padding-left:10px; cursor:pointer; ') (Tilastoi)
+  h2 Luo ottelu
+  form(action="/creatematch", method="post")
+    | Päivämäärä: 
+    input(type="date", name="date")
+    | Joukkue: 
+    select(id="team", name="team")
+      each team in teams
+        option(value="#{team.id}") #{team.name}
+    | Vastustaja:
+    input(type="text", name="opponent")
+    | Tilastoija:
+    select(id="user", name="user") 
+      each user in users
+        option(value="#{user.id}") #{user.name}
+    input(type="submit") 
+      

@@ -1,0 +1,19 @@
+extends layout
+
+block content
+  h2 Tilastoijat
+  
+  ul
+  each user in users
+    li
+      = user.name
+      | &nbsp;
+      | (
+      a(href="/users/" + user.id + "/destroy") Poista
+      | )
+  h2 Luo uusi tilastoija
+  form(action="/createuser", method="post")
+    | Nimi: 
+    input(type="text", name="name")
+    input(type="submit")
+  

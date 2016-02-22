@@ -1,0 +1,24 @@
+extends layout
+
+block content
+  h2 Joukkueet jo järjestelmässä
+  
+  ul
+  each team in teams
+    li
+      = team.name
+      | &nbsp;
+      | (
+      a(href="/teams/" + team.id + "/destroy") Poista
+      | )
+      | (
+      a(href="/teams/" + team.name + "/edit") Muokkaa
+      | )
+  h2 Luo uusi joukkue
+  form(action="/createteam", method="post")
+    | Nimi: 
+    input(type="text", name="name")
+    | Ikäluokka: 
+    input(type="text", name="age")
+    input(type="submit")
+  

@@ -1,0 +1,46 @@
+doctype html
+html(lang='en')
+  head
+    meta(charset='UTF-8')
+    meta(name='viewport', content='width=device-width')
+    title= title
+    block css
+      link(rel='stylesheet', href='/css/style.css')
+    block js
+      if ENV_DEVELOPMENT
+        script(src='http://localhost:35729/livereload.js')
+  body(style='background-color: #faf9f0')
+    #logo
+      img(src='/img/logo.jpg')
+    nav
+      ul(style='list-style-type: none; margin: 0; padding: 0; overflow: hidden; background-color: #333;')
+        li(style='float: left; display: inline')
+          a(href='/matches' style='display: block; color: white; text-align: center;  padding: 14px 16px; text-decoration: none;') Ottelut
+        li(style='float: left; display: inline')
+          a(href='/players' style='display: block; color: white; text-align: center;  padding: 14px 16px; text-decoration: none;') Pelaajat
+        li(style='float: left; display: inline')
+          a(href='/teams' style='display: block; color: white; text-align: center;  padding: 14px 16px; text-decoration: none;') Joukkueet
+        li(style='float: left; display: inline')
+          a(href='/users' style='display: block; color: white; text-align: center;  padding: 14px 16px; text-decoration: none;') Tilastoijat
+        li(style='float: left; display: inline')
+          a(href='/rotations' style='display: block; color: white; text-align: center;  padding: 14px 16px; text-decoration: none;') Rotaatiot
+        li(style='float: right; display:inline')
+          if (!user)
+            form(role='form', action="/login",method="post", style='max-width: 300px;')
+              .form-group
+                  input.form-control(type='text', name="username", placeholder='Käyttäjätunnus')
+              .form-group
+                  input.form-control(type='password', name="password", placeholder='Salasana')
+              button.btn.btn-default(type='submit') Kirjaudu
+          if (user)
+           | logged in as #{user.username}
+           a(href="/logout") Logout
+    .container
+        .main-content
+          block content
+    block footer
+      footer
+        .container
+          p
+            | Copyright &copy; 2016 
+            | JujuVolley 

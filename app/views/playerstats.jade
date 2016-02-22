@@ -1,0 +1,56 @@
+      
+block content
+  table(border=1)
+    tr
+      th 
+      th(colspan=5) Vastaanotto 
+      th(colspan=3) Syöttö
+      th(colspan=4) Hyökkäys
+      th(colspan=1) Torjunta
+    tr
+      th Pelaaja      
+      th %        
+      th 1-nostot
+      th 1+2 nostot
+      th Virheet
+      th Kaikki
+      th Ässät
+      th Virheet
+      th Syötöt
+      th %
+      th Pisteet 
+      th Virheet
+      th Hyökkäykset
+      th Torjunnat
+    each stat in stats
+      tr
+        td
+          =stat.name           
+        td
+          =stat.passEff
+        td
+          =stat.passExc
+        td
+          =stat.passGood
+        td
+          =stat.passErr        
+        td
+          =stat.passTotal
+        td
+          =stat.serveAce
+        td
+          =stat.serveErr
+        td
+          =stat.serveTotal
+        td
+          =stat.attackEff
+        td
+          =stat.attackExc
+        td
+          =stat.attackErr
+        td
+          =stat.attackTotal
+        td
+          =stat.blockTot
+    
+    
