@@ -8,6 +8,15 @@ block content
       document.getElementById("statValue").value = statValue;
       document.getElementById("round").value = round;            
     };
+    function incRound(round) {
+      if(round.value==''){
+        round.value = '2';
+      }
+      else {
+        round.value ++;
+      }
+      alert(round.value);
+    }
   h3 Ottelu #{match.Team.name}
     | - 
     | #{match.opponent}
@@ -23,10 +32,10 @@ block content
       input(type="hidden" name="stat" id="stat")
       input(type="hidden" name="statValue" id="statValue")
       // alusta round jossain muualla tai resetoituu jokaisen submitin aikaan.
-      - var round=1 
+      - var round=1
       p Erä #{round} &nbsp;
         // nappi ei toimi
-        button(type="button", onclick=" round++ ").
+        button(type="button", onclick=" incRound(round) ").
           Erän vaihto 
         
       table(border='1')
