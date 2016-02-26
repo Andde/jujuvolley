@@ -1,44 +1,62 @@
 var express = require('express'),
   router = express.Router(),
+  crypto = require('crypto'),
   db = require('../models');
-
+  
 module.exports = function (app) {
   app.use('/', router);
 };
 
+function checkAuth(req, res, next) {
+    if (!req.session.user_id) {
+       res.render('error');
+    } else {
+     next();
+    }
+}
 // Indeksi 
 router.get('/', function (req, res) {
-    res.render('index', { user : req.user });
+    res.locals.user = req.session.user_id || null;
+    res.render('index', { user : req.session.user_id });
 });
+
 
 router.get('/register', function(req, res) {
     res.render('register', { });
 });
 
 router.post('/register', function(req, res) {
-    db.Account.register(new Account({ username : req.body.username }), req.body.password, function(err, account) {
-        if (err) {
-            return res.render('register', { account : account });
-        }
-
-    });
-});
-
-router.get('/login', function(req, res) {
-    res.render('login', { user : req.user });
+  db.Account.create({
+    username: req.body.username,
+	password: crypto.createHash('sha256').update(req.body.password).digest('base64')
+  }).then(function() {
+    res.redirect('/');
+  });
 });
 
 router.post('/login',  function(req, res) {
-    res.redirect('/');
-});
+  db.Account.findOne({ where: {username: req.body.username, password: crypto.createHash('sha256').update(req.body.password).digest('base64') }}).then(function(user) {
+    if(user) {
+      req.session.user_id = user.id;
+      res.locals.user=user.id
+      res.redirect('/matches');
+    } else {
+      res.render('error');
+    }        
+  });
+}); 
+
 
 router.get('/logout', function(req, res) {
-    req.logout();
+    req.session.destroy(function (err){
+        
+    });
     res.redirect('/');
 });
 
 // Joukkueet 
-router.get('/teams', function (req, res, next) {
+router.get('/teams', checkAuth, function (req, res, next) {
+  res.locals.user = req.session.user_id || null;
   db.Team.findAll().then(function (teams) {
     res.render('teams', {
       title: 'Teams',
@@ -48,7 +66,7 @@ router.get('/teams', function (req, res, next) {
 });
 
 // luo joukkue
-router.post('/createteam', function(req, res) {
+router.post('/createteam', checkAuth, function(req, res) {
   db.Team.create({
     name: req.body.name,
 	age: req.body.age
@@ -58,7 +76,8 @@ router.post('/createteam', function(req, res) {
 });
 
 // poista joukkue
-router.get('/teams/:team_id/destroy', function(req, res) {
+router.get('/teams/:team_id/destroy', checkAuth, function(req, res) {
+  res.locals.user = req.session.user_id || null;
   db.Team.destroy({
     where: {
       id: req.params.team_id
@@ -69,9 +88,9 @@ router.get('/teams/:team_id/destroy', function(req, res) {
 });
 
 // Muokkaa
-router.get('/teams/:team_name/edit', function (req, res, next) {
-  var teamname = req.params.team_name
-db.Team.findOne({ where: {name: teamname }, include: [db.Player]}).then(function (team) {
+router.get('/teams/:team_name/edit', checkAuth, function (req, res, next) {
+  res.locals.user = req.session.user_id || null;
+  db.Team.findOne({ where: {name: req.params.team_name }, include: [db.Player]}).then(function (team) {
     res.render('team', {
       title: 'Team',
       team: team
@@ -81,7 +100,8 @@ db.Team.findOne({ where: {name: teamname }, include: [db.Player]}).then(function
 
 
 // tee tilasto joukkueelle
-router.get('/teams/:team_id/makestats', function(req, res) {
+router.get('/teams/:team_id/makestats', checkAuth, function(req, res) {
+  res.locals.user = req.session.user_id || null;
   db.Team.findById(req.params.team_id, {include: [db.Player]} ).then(function(team) {
     res.render('stats', {
       title: 'Team',
@@ -91,7 +111,7 @@ router.get('/teams/:team_id/makestats', function(req, res) {
 });
 
 // luo tilasto
-router.post('/teams/:team_id/savestats', function(req, res) {
+router.post('/teams/:team_id/savestats', checkAuth, function(req, res) {
     db.MatchStat.create({
       round: req.body.round,
 	  PlayerId: req.body.player,
@@ -104,7 +124,8 @@ router.post('/teams/:team_id/savestats', function(req, res) {
 });
 
 // OTTELUT
-router.get('/matches', function (req, res, next) {
+router.get('/matches', checkAuth, function (req, res, next) {
+  res.locals.user = req.session.user_id || null;
   db.User.findAll().then( function (users) {
     db.Team.findAll().then( function (teams) {
     db.Match.findAll({include: [db.Team]}).then(function (matches) {
@@ -121,7 +142,8 @@ router.get('/matches', function (req, res, next) {
 
 // tee tilasto joukkueelle
 // hakee samalla joukkestatsit
-router.get('/matches/:match_id/:team_id/makestats', function(req, res) {
+router.get('/matches/:match_id/:team_id/makestats', checkAuth, function(req, res) {
+  res.locals.user = req.session.user_id || null;
   db.Match.findById(req.params.match_id, {include: [{model: db.User},{model: db.Team, include: [db.Player]}]} ).then(function(match) {
     db.MatchStat.getTeam2(req.params.match_id).then(function (tstats) {
       db.MatchStat.getTest3(req.params.match_id,req.params.team_id).then(function (stats) {
@@ -137,7 +159,7 @@ router.get('/matches/:match_id/:team_id/makestats', function(req, res) {
 });
 
 // luo tilasto
-router.post('/matches/:match_id/:team_id/savestats', function(req, res) {
+router.post('/matches/:match_id/:team_id/savestats', checkAuth, function(req, res) {
     db.MatchStat.create({
       round: req.body.round,
 	  PlayerId: req.body.player,
@@ -151,7 +173,7 @@ router.post('/matches/:match_id/:team_id/savestats', function(req, res) {
 
 
 // Luo ottelu
-router.post('/creatematch', function(req, res) {
+router.post('/creatematch', checkAuth, function(req, res) {
     db.Match.create({
       date: req.body.date,
       opponent: req.body.opponent,
@@ -165,7 +187,8 @@ router.post('/creatematch', function(req, res) {
 
 // Pelaajat
 // haetaan myös kaikki joukkueet valintalistaan. 
-router.get('/players', function (req, res, next) {
+router.get('/players', checkAuth, function (req, res, next) {
+  res.locals.user = req.session.user_id || null;
   db.Team.findAll().then( function (teams) {
     db.Player.findAll({include: [db.Team]}).then(function (players) {
       res.render('players', {
@@ -178,7 +201,7 @@ router.get('/players', function (req, res, next) {
 });
 
 // luo pelaaja
-router.post('/createplayer', function(req, res) {
+router.post('/createplayer', checkAuth, function(req, res) {
     db.Player.create({
       name: req.body.name,
 	  number: req.body.number,
@@ -188,7 +211,8 @@ router.post('/createplayer', function(req, res) {
       });
 });
 // poista pelaaja
-router.get('/players/:player_id/destroy', function(req, res) {
+router.get('/players/:player_id/destroy', checkAuth, function(req, res) {
+  res.locals.user = req.session.user_id || null;
   db.Player.destroy({
     where: {
       id: req.params.player_id
@@ -199,7 +223,8 @@ router.get('/players/:player_id/destroy', function(req, res) {
 });
 
 // Tilastoija
-router.get('/users', function (req, res, next) {
+router.get('/users', checkAuth, function (req, res, next) {
+  res.locals.user = req.session.user_id || null;
   db.User.findAll().then(function (users) {
     res.render('users', {
       title: 'users',
@@ -208,7 +233,7 @@ router.get('/users', function (req, res, next) {
   });
 });
 // luo Tilastoija
-router.post('/createuser', function(req, res) {
+router.post('/createuser', checkAuth, function(req, res) {
   db.User.create({
     name: req.body.name,
   }).then(function() {
@@ -216,7 +241,8 @@ router.post('/createuser', function(req, res) {
   });
 });
 // poista Tilastoija
-router.get('/users/:user_id/destroy', function(req, res) {
+router.get('/users/:user_id/destroy', checkAuth, function(req, res) {
+  res.locals.user = req.session.user_id || null;
   db.User.destroy({
     where: {
       id: req.params.user_id
@@ -227,7 +253,8 @@ router.get('/users/:user_id/destroy', function(req, res) {
 });
 
 // Tilastoija
-router.get('/rotations', function (req, res, next) {
+router.get('/rotations', checkAuth, function (req, res, next) {
+  res.locals.user = req.session.user_id || null;
   res.render('rotations', {
     title: 'rotations',
   });

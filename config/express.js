@@ -1,6 +1,7 @@
 var express = require('express');
 var glob = require('glob');
-
+var crypto = require('crypto');
+var session = require('express-session')
 var favicon = require('serve-favicon');
 var logger = require('morgan');
 var cookieParser = require('cookie-parser');
@@ -27,7 +28,8 @@ module.exports = function(app, config) {
   app.use(compress());
   app.use(express.static(config.root + '/public'));
   app.use(methodOverride());
-
+  app.use(session({ secret: 'keyboard cat', cookie: { maxAge: 60000 }}));
+  
   var controllers = glob.sync(config.root + '/app/controllers/*.js');
   controllers.forEach(function (controller) {
     require(controller)(app);
